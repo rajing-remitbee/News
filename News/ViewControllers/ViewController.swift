@@ -38,6 +38,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         label.isHidden = true //Hide the lable at start
         return label
     }()
+    
+    //Implement ActivityIndicator
+    private let activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.hidesWhenStopped = true
+        return activityIndicator
+    }()
 
     
     private var articles = [Article]() //Store articles
@@ -50,6 +57,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         view.addSubview(tableView) //Add tableview
         view.addSubview(noResultsLabel) //Add NoResultsLabel
+        view.addSubview(activityIndicator) //Add ActivityIndicator
         
         tableView.delegate = self //Set table delegate
         tableView.dataSource = self //Set table source
@@ -65,12 +73,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewDidLayoutSubviews()
         //Set table to fill entire view
         tableView.frame = view.bounds
+        //Place Label
         noResultsLabel.frame = CGRect(x: 0, y: (view.frame.height - 50) / 2, width: view.frame.width, height: 50)
+        //Place activity indicator in center
+        activityIndicator.center = view.center
         
     }
     
     //Method which fetch the news
     func fetchNews() {
+        //Start loading
+        activityIndicator.startAnimating()
         //Fetch data from API
         APICaller.shared.getTopStories { [weak self] result in
             switch result {
@@ -92,6 +105,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 
                 //Update in mainUI
                 DispatchQueue.main.async {
+                    self?.activityIndicator.stopAnimating()
                     self?.tableView.reloadData()
                 }
                 //Failure
