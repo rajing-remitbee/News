@@ -7,51 +7,48 @@
 
 import Foundation
 
+//APICaller class for fetching data from API
 final class APICaller {
+    
+    //Shared object to access the APICaller class's object
     static let shared = APICaller()
     
+    //Struct to hold static value
     struct Constants {
-        static let topHeadLinesURL = URL(string: "https://newsapi.org/v2/top-headlines?country=us&apiKey=0d236005e1ae453a98cfec06e9834431")
+        static let topHeadLinesURL = URL(
+            string: API_URL
+        )
     }
     
+    //Private initializer
     private init() {}
     
+    //Fetch top stories using ghe backend details.
     public func getTopStories(completion: @escaping (Result<[Article], Error>) -> Void) {
+        //Ensure the validity of the URL
         guard let url = Constants.topHeadLinesURL else {
             return
         }
+        //URLSession to fetch the data from the backend
         let task = URLSession.shared.dataTask(with: url) {data, _, error in
+            //If any error the code will fail
             if let error = error {
                 completion(.failure(error))
+                //If success the code will following execution
             } else if let data = data {
                 do {
+                    //Decode the response into APIMode
                     let result = try JSONDecoder().decode(APIResponse.self, from: data)
-                    print("Count \(result.articles.count)")
+                    //Detect and store the data
                     completion(.success(result.articles))
                 } catch {
+                    //Show error message it false
                     completion(.failure(error))
                 }
             }
             
         }
+        //Start  with delect button
         task.resume()
     }
 }
-
-struct APIResponse: Codable {
-    let articles: [Article]
-}
-
-struct Article: Codable {
-    let source: Source
-    let title: String
-    let description: String?
-    let url: String?
-    let urlToImage: String?
-    let publishedAt: String
-}
-
-struct Source: Codable {
-    let name: String
-}
-
