@@ -13,17 +13,32 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     //Implement tableview
     private let tableView: UITableView = {
         let table = UITableView()
+        //Register table in UI
         table.register(NewsTableViewCell.self, forCellReuseIdentifier: NewsTableViewCell.identifier)
         return table
     }()
     
     //Implement SearchController
     private let searchController: UISearchController = {
+        //Initialize SearchController and Properties
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.placeholder = "Search..."
         searchController.obscuresBackgroundDuringPresentation = false
         return searchController
     }()
+    
+    //Implement NoResults Label
+    private let noResultsLabel: UILabel = {
+        //Initialize NoResults label and properties
+        let label = UILabel()
+        label.text = "No Results Found"
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 20, weight: .medium)
+        label.textColor = .secondaryLabel
+        label.isHidden = true //Hide the lable at start
+        return label
+    }()
+
     
     private var articles = [Article]() //Store articles
     private var viewModels = [NewsTableViewCellViewModel]() //Store viewmodel data
@@ -34,6 +49,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         title = "News" //Title
         
         view.addSubview(tableView) //Add tableview
+        view.addSubview(noResultsLabel) //Add NoResultsLabel
+        
         tableView.delegate = self //Set table delegate
         tableView.dataSource = self //Set table source
         view.backgroundColor = .systemBackground //Set background
@@ -48,6 +65,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewDidLayoutSubviews()
         //Set table to fill entire view
         tableView.frame = view.bounds
+        noResultsLabel.frame = CGRect(x: 0, y: (view.frame.height - 50) / 2, width: view.frame.width, height: 50)
+        
     }
     
     //Method which fetch the news
@@ -124,7 +143,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             tableView.reloadData()
             return
         }
+        //Filter the data
         filteredViewModels = viewModels.filter { $0.title.lowercased().contains(searchText.lowercased()) }
+        //Show message if no data available
+        noResultsLabel.isHidden = !filteredViewModels.isEmpty
+        //Refresh the data
         tableView.reloadData()
     }
 

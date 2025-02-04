@@ -65,14 +65,14 @@ class NewsTableViewCell: UITableViewCell {
         )
         //Subtitle properties
         newsSubTitleLabel.frame = CGRect(
-            x: 5,
+            x: 10,
             y: 70,
             width: contentView.frame.size.width - 170,
             height: contentView.frame.size.height / 2
         )
         //Imageview properties
         newsImageView.frame = CGRect(
-            x: contentView.frame.size.width - 160,
+            x: contentView.frame.size.width - 150,
             y: 5,
             width: 140,
             height: contentView.frame.size.height - 10
